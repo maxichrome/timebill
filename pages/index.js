@@ -202,7 +202,7 @@ export default function HomePage() {
 												[
 													...entries.slice(0, index + 1),
 													{
-														hours: Math.floor(Math.random() * 50),
+														hours: 0,
 														minutes: 0,
 														seconds: 0,
 													},
