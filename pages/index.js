@@ -1,5 +1,8 @@
 import Head from "next/head";
 import { useCallback, useEffect, useState } from "react";
+import { Button } from "../components/button";
+import { MaxichromeEmblem } from "../components/emblem";
+import { Input } from "../components/input";
 import styles from "../styles/Home.module.css";
 
 const MoneyText = ({ entry, rate }) => {
@@ -24,7 +27,10 @@ export default function HomePage() {
 		hours: 0,
 		minutes: 0,
 		seconds: 0,
+		decimal: 0,
 	});
+
+	const [saveText, setSaveText] = useState("save");
 
 	const updateTimeEntry = useCallback(
 		(index, newData) => {
@@ -45,6 +51,12 @@ export default function HomePage() {
 			)
 		);
 		localStorage.setItem("rate", JSON.stringify(empty ? 0 : rate));
+
+		setSaveText("saved!");
+
+		setTimeout(() => {
+			setSaveText("save");
+		}, 3000);
 	};
 
 	useEffect(() => {
@@ -62,12 +74,15 @@ export default function HomePage() {
 			hours: 0,
 			minutes: 0,
 			seconds: 0,
+			decimal: 0,
 		};
 
 		timeEntries.forEach((entry) => {
 			newTotals.hours += entry.hours;
 			newTotals.minutes += entry.minutes;
 			newTotals.seconds += entry.seconds;
+			newTotals.decimal +=
+				(entry.seconds / 60 + entry.minutes) / 60 + entry.hours;
 		});
 
 		setTotals(newTotals);
@@ -81,173 +96,152 @@ export default function HomePage() {
 
 			<main>
 				<h1>time bill calculator</h1>
+				<p className={styles.subtitle}>figure out how much ya gettin paid</p>
 
-				<hr />
+				<section>
+					<label className={styles.rateForm}>
+						<h2>hourly rate</h2>
+						<Input
+							id="rateInput"
+							type="number"
+							value={rate}
+							min={0}
+							onChange={(e) => setRate(+e.target.value)}
+						/>
+					</label>
+				</section>
 
-				<button onClick={() => saveLocalState()}>save</button>
-				<button
-					onClick={() =>
-						setTimeEntries((entries) =>
-							entries.map(() => ({ hours: 0, minutes: 0, seconds: 0 }))
-						)
-					}
-				>
-					clear
-				</button>
-				<button
-					onClick={() => {
-						if (
-							!confirm(
-								"this will permanently clear your saved data. are you sure?"
-							)
-						)
-							return;
-
-						setTimeEntries([{ hours: 0, minutes: 0, seconds: 0 }]);
-						setRate(0);
-
-						saveLocalState(true);
-					}}
-				>
-					reset
-				</button>
-
-				<hr />
-
-				<label htmlFor="rateInput">hourly rate</label>
-				<br />
-				<input
-					id="rateInput"
-					type="number"
-					value={rate}
-					min={0}
-					onChange={(e) => setRate(+e.target.value)}
-				/>
-
-				<hr />
-
-				<table className={styles.timeTable}>
-					<thead>
-						<tr>
-							<th>hours</th>
-							<th>minutes</th>
-							<th>seconds</th>
-							<th>billable</th>
-							<th></th>
-						</tr>
-					</thead>
-					<tbody>
-						{timeEntries.map((entry, index) => (
-							<tr key={index}>
-								<td>
-									<input
-										type="number"
-										value={entry.hours}
-										min={0}
-										onChange={(e) => {
-											updateTimeEntry(index, { hours: +e.target.value || "" });
-										}}
-										onBlur={(e) => {
-											if (!entry.hours) updateTimeEntry(index, { hours: 0 });
-										}}
-									/>
-								</td>
-								<td>
-									<input
-										type="number"
-										value={entry.minutes}
-										min={0}
-										max={59}
-										onChange={(e) => {
-											updateTimeEntry(index, {
-												minutes: +e.target.value || "",
-											});
-										}}
-										onBlur={(e) => {
-											if (!entry.minutes)
-												updateTimeEntry(index, { minutes: 0 });
-										}}
-									/>
-								</td>
-								<td>
-									<input
-										type="number"
-										value={entry.seconds}
-										min={0}
-										max={59}
-										onChange={(e) => {
-											updateTimeEntry(index, {
-												seconds: +e.target.value || "",
-											});
-										}}
-										onBlur={(e) => {
-											if (!entry.seconds)
-												updateTimeEntry(index, { seconds: 0 });
-										}}
-									/>
-								</td>
-								<td>
-									<MoneyText entry={entry} rate={rate} />
-								</td>
-								<td>
-									<button
-										disabled={index === 0}
-										onClick={() => {
-											setTimeEntries((entries) =>
-												entries.filter((_, i) => i !== index)
-											);
-										}}
-									>
-										-
-									</button>
-									<button
-										onClick={() => {
-											setTimeEntries((entries) =>
-												[
-													...entries.slice(0, index + 1),
-													{
-														hours: 0,
-														minutes: 0,
-														seconds: 0,
-													},
-													...entries.slice(index + 1),
-												].flat()
-											);
-										}}
-									>
-										+
-									</button>
-								</td>
+				<section>
+					<div className={styles.timeTable} role="table">
+						<header role="rowgroup">
+							<div role="row">
+								<th>hours</th>
+								<th>minutes</th>
+								<th>seconds</th>
+								<th>amount</th>
+								<th></th>
+							</div>
+						</header>
+						<ul role="rowgroup">
+							{timeEntries.map((entry, index) => (
+								<tr key={index}>
+									<td>
+										<Input
+											type="number"
+											value={entry.hours}
+											min={0}
+											onChange={(e) => {
+												updateTimeEntry(index, {
+													hours: +e.target.value || "",
+												});
+											}}
+											onBlur={(e) => {
+												if (!entry.hours) updateTimeEntry(index, { hours: 0 });
+											}}
+										/>
+									</td>
+									<td>
+										<Input
+											type="number"
+											value={entry.minutes}
+											min={0}
+											max={59}
+											onChange={(e) => {
+												updateTimeEntry(index, {
+													minutes: +e.target.value || "",
+												});
+											}}
+											onBlur={(e) => {
+												if (!entry.minutes)
+													updateTimeEntry(index, { minutes: 0 });
+											}}
+										/>
+									</td>
+									<td>
+										<Input
+											type="number"
+											value={entry.seconds}
+											min={0}
+											max={59}
+											onChange={(e) => {
+												updateTimeEntry(index, {
+													seconds: +e.target.value || "",
+												});
+											}}
+											onBlur={(e) => {
+												if (!entry.seconds)
+													updateTimeEntry(index, { seconds: 0 });
+											}}
+										/>
+									</td>
+									<td>
+										<MoneyText entry={entry} rate={rate} />
+									</td>
+									<td>
+										<Button
+											disabled={timeEntries.length <= 1}
+											onClick={() => {
+												setTimeEntries((entries) =>
+													entries.filter((_, i) => i !== index)
+												);
+											}}
+										>
+											-
+										</Button>
+										<Button
+											onClick={() => {
+												setTimeEntries((entries) =>
+													[
+														...entries.slice(0, index + 1),
+														{
+															hours: 0,
+															minutes: 0,
+															seconds: 0,
+														},
+														...entries.slice(index + 1),
+													].flat()
+												);
+											}}
+										>
+											+
+										</Button>
+									</td>
+								</tr>
+							))}
+							<tr className={styles.totalHeadingRow}>
+								<th></th>
+								<th></th>
+								<th></th>
+								<th>total</th>
+								<th></th>
 							</tr>
-						))}
-						<tr className={styles.totalHeadingRow}>
-							<th></th>
-							<th></th>
-							<th></th>
-							<th>total</th>
-							<th></th>
-						</tr>
-						<tr className={styles.totalRow}>
-							<td>{totals.hours}h</td>
-							<td>{totals.minutes}m</td>
-							<td>{totals.seconds}s</td>
-							<td className={styles.totalValue}>
-								<MoneyText entry={totals} rate={rate} />
-							</td>
-							<td />
-						</tr>
-					</tbody>
-				</table>
+							<tr className={styles.totalRow}>
+								<td>{totals.hours}h</td>
+								<td>{totals.minutes}m</td>
+								<td>{totals.seconds}s</td>
+								<td className={styles.totalValue}>
+									<MoneyText entry={totals} rate={rate} />
+								</td>
+								<td>{Math.floor(totals.decimal * 10000) / 10000}h</td>
+							</tr>
+						</ul>
+					</div>
+
+					<Button
+						onClick={() =>
+							setTimeEntries((entries) =>
+								entries.map(() => ({ hours: 0, minutes: 0, seconds: 0 }))
+							)
+						}
+					>
+						clear entries
+					</Button>
+				</section>
 			</main>
 
 			<footer>
 				<hr />
 				<p>
-					made by{" "}
-					<a href="https://maxichrome.dev" target="_blank" rel="noreferrer">
-						maxichrome
-					</a>{" "}
-					&middot;{" "}
 					<small>
 						<a
 							href="https://github.com/maxichrome/bill"
@@ -258,6 +252,8 @@ export default function HomePage() {
 						</a>
 					</small>
 				</p>
+
+				<MaxichromeEmblem />
 			</footer>
 		</div>
 	);

@@ -1,0 +1,15 @@
+.button {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	padding: 4px 8px;
+
+	font-weight: 500;
+	font-size: 14px;
+	line-height: 17px;
+
+	background: linear-gradient(to bottom, #ffffff 0%, #ededed 100%);
+	border: 1px solid #a8a8a8;
+	box-sizing: border-box;
+	border-radius: 5px;
+}
