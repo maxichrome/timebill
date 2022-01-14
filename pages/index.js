@@ -247,6 +247,10 @@ export default function HomePage() {
 
 					<Button
 						onClick={() =>
+							confirm("want to clear all entry data? this is irreversible.") &&
+							confirm(
+								"double checking -- your data will NOT be recoverable! erase all time entries?"
+							) &&
 							setTimeEntries((entries) => entries.map(() => EMPTY_TIME_ENTRY))
 						}
 					>
