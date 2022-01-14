@@ -1,9 +1,17 @@
+import classNames from "classnames";
 import Head from "next/head";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "../components/button";
 import { MaxichromeEmblem } from "../components/emblem";
 import { Input } from "../components/input";
 import styles from "../styles/Home.module.css";
+
+const EMPTY_TIME_ENTRY = {
+	note: "",
+	hours: 0,
+	minutes: 0,
+	seconds: 0,
+};
 
 const MoneyText = ({ entry, rate }) => {
 	const valueInHundredths = Math.floor(
@@ -20,17 +28,13 @@ const MoneyText = ({ entry, rate }) => {
 
 export default function HomePage() {
 	const [rate, setRate] = useState(0);
-	const [timeEntries, setTimeEntries] = useState([
-		{ hours: 0, minutes: 0, seconds: 0 },
-	]);
+	const [timeEntries, setTimeEntries] = useState([EMPTY_TIME_ENTRY]);
 	const [totals, setTotals] = useState({
 		hours: 0,
 		minutes: 0,
 		seconds: 0,
 		decimal: 0,
 	});
-
-	const [saveText, setSaveText] = useState("save");
 
 	const updateTimeEntry = useCallback(
 		(index, newData) => {
@@ -43,21 +47,16 @@ export default function HomePage() {
 		[setTimeEntries]
 	);
 
-	const saveLocalState = (empty = false) => {
-		localStorage.setItem(
-			"timeEntries",
-			JSON.stringify(
-				empty ? [{ hours: 0, minutes: 0, seconds: 0 }] : timeEntries
-			)
-		);
-		localStorage.setItem("rate", JSON.stringify(empty ? 0 : rate));
-
-		setSaveText("saved!");
-
-		setTimeout(() => {
-			setSaveText("save");
-		}, 3000);
-	};
+	const saveLocalState = useCallback(
+		(empty = false) => {
+			localStorage.setItem(
+				"timeEntries",
+				JSON.stringify(empty ? [EMPTY_TIME_ENTRY] : timeEntries)
+			);
+			localStorage.setItem("rate", JSON.stringify(empty ? 0 : rate));
+		},
+		[rate, timeEntries]
+	);
 
 	useEffect(() => {
 		// bring in local storage on initial mount
@@ -88,14 +87,18 @@ export default function HomePage() {
 		setTotals(newTotals);
 	}, [timeEntries]);
 
+	useEffect(() => {
+		saveLocalState();
+	}, [saveLocalState, timeEntries, rate]);
+
 	return (
 		<div>
 			<Head>
-				<title>time bill calculator</title>
+				<title>timebill</title>
 			</Head>
 
 			<main>
-				<h1>time bill calculator</h1>
+				<h1>timebill</h1>
 				<p className={styles.subtitle}>figure out how much ya gettin paid</p>
 
 				<section>
@@ -114,18 +117,42 @@ export default function HomePage() {
 				<section>
 					<div className={styles.timeTable} role="table">
 						<header role="rowgroup">
-							<div role="row">
-								<th>hours</th>
-								<th>minutes</th>
-								<th>seconds</th>
-								<th>amount</th>
-								<th></th>
+							<div role="row" className={styles.entryRow}>
+								<div className={styles.noteCell} role="cell">
+									note
+								</div>
+								<div className={styles.thinCell} role="cell">
+									hours
+								</div>
+								<div className={styles.thinCell} role="cell">
+									minutes
+								</div>
+								<div className={styles.thinCell} role="cell">
+									seconds
+								</div>
+								<div className={styles.thinCell} role="cell">
+									amount
+								</div>
+								<div className={styles.actionCell} role="cell">
+									actions
+								</div>
 							</div>
 						</header>
 						<ul role="rowgroup">
 							{timeEntries.map((entry, index) => (
-								<tr key={index}>
-									<td>
+								<li key={index} className={styles.entryRow} role="row">
+									<div className={styles.noteCell} role="cell">
+										<Input
+											type="text"
+											value={entry.note}
+											onChange={(e) => {
+												updateTimeEntry(index, {
+													note: e.target.value,
+												});
+											}}
+										/>
+									</div>
+									<div className={styles.thinCell} role="cell">
 										<Input
 											type="number"
 											value={entry.hours}
@@ -136,11 +163,14 @@ export default function HomePage() {
 												});
 											}}
 											onBlur={(e) => {
-												if (!entry.hours) updateTimeEntry(index, { hours: 0 });
+												if (!entry.hours)
+													updateTimeEntry(index, {
+														hours: 0,
+													});
 											}}
 										/>
-									</td>
-									<td>
+									</div>
+									<div className={styles.thinCell} role="cell">
 										<Input
 											type="number"
 											value={entry.minutes}
@@ -156,8 +186,8 @@ export default function HomePage() {
 													updateTimeEntry(index, { minutes: 0 });
 											}}
 										/>
-									</td>
-									<td>
+									</div>
+									<div className={styles.thinCell} role="cell">
 										<Input
 											type="number"
 											value={entry.seconds}
@@ -173,11 +203,11 @@ export default function HomePage() {
 													updateTimeEntry(index, { seconds: 0 });
 											}}
 										/>
-									</td>
-									<td>
+									</div>
+									<div className={styles.thinCell} role="cell">
 										<MoneyText entry={entry} rate={rate} />
-									</td>
-									<td>
+									</div>
+									<div className={styles.actionCell} role="cell">
 										<Button
 											disabled={timeEntries.length <= 1}
 											onClick={() => {
@@ -193,11 +223,7 @@ export default function HomePage() {
 												setTimeEntries((entries) =>
 													[
 														...entries.slice(0, index + 1),
-														{
-															hours: 0,
-															minutes: 0,
-															seconds: 0,
-														},
+														EMPTY_TIME_ENTRY,
 														...entries.slice(index + 1),
 													].flat()
 												);
@@ -205,33 +231,23 @@ export default function HomePage() {
 										>
 											+
 										</Button>
-									</td>
-								</tr>
+									</div>
+								</li>
 							))}
-							<tr className={styles.totalHeadingRow}>
-								<th></th>
-								<th></th>
-								<th></th>
-								<th>total</th>
-								<th></th>
-							</tr>
-							<tr className={styles.totalRow}>
-								<td>{totals.hours}h</td>
-								<td>{totals.minutes}m</td>
-								<td>{totals.seconds}s</td>
-								<td className={styles.totalValue}>
-									<MoneyText entry={totals} rate={rate} />
-								</td>
-								<td>{Math.floor(totals.decimal * 10000) / 10000}h</td>
-							</tr>
+							<li
+								role="row"
+								className={classNames(styles.entryRow, styles.totalRow)}
+							>
+								<div role="cell" className={styles.totalValue}>
+									Total amount: <MoneyText entry={totals} rate={rate} />
+								</div>
+							</li>
 						</ul>
 					</div>
 
 					<Button
 						onClick={() =>
-							setTimeEntries((entries) =>
-								entries.map(() => ({ hours: 0, minutes: 0, seconds: 0 }))
-							)
+							setTimeEntries((entries) => entries.map(() => EMPTY_TIME_ENTRY))
 						}
 					>
 						clear entries
@@ -240,7 +256,6 @@ export default function HomePage() {
 			</main>
 
 			<footer>
-				<hr />
 				<p>
 					<small>
 						<a
@@ -248,7 +263,7 @@ export default function HomePage() {
 							target="_blank"
 							rel="noreferrer"
 						>
-							source code
+							github
 						</a>
 					</small>
 				</p>
