@@ -2,14 +2,18 @@ import Head from "next/head";
 import { useCallback, useEffect, useState } from "react";
 import styles from "../styles/Home.module.css";
 
-const Money = ({ entry, rate }) => (
-	<>
-		$
-		{Math.floor(
-			((entry.seconds / 60 + entry.minutes) / 60 + entry.hours) * rate * 100
-		) / 100}
-	</>
-);
+const MoneyText = ({ entry, rate }) => {
+	const valueInHundredths = Math.floor(
+		((entry.seconds / 60 + entry.minutes) / 60 + entry.hours) * rate * 100
+	);
+
+	return (
+		<>
+			${Math.floor(valueInHundredths / 100)}.
+			{(valueInHundredths % 100).toString().padStart(2, "0")}
+		</>
+	);
+};
 
 export default function HomePage() {
 	const [rate, setRate] = useState(0);
@@ -183,7 +187,7 @@ export default function HomePage() {
 									/>
 								</td>
 								<td>
-									<Money entry={entry} rate={rate} />
+									<MoneyText entry={entry} rate={rate} />
 								</td>
 								<td>
 									<button
@@ -228,7 +232,7 @@ export default function HomePage() {
 							<td>{totals.minutes}m</td>
 							<td>{totals.seconds}s</td>
 							<td className={styles.totalValue}>
-								<Money entry={totals} rate={rate} />
+								<MoneyText entry={totals} rate={rate} />
 							</td>
 							<td />
 						</tr>
