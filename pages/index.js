@@ -240,9 +240,19 @@ export default function HomePage() {
 				<hr />
 				<p>
 					made by{" "}
-					<a href="https://maxichrome.dev" target="blank">
+					<a href="https://maxichrome.dev" target="_blank" rel="noreferrer">
 						maxichrome
-					</a>
+					</a>{" "}
+					&middot;{" "}
+					<small>
+						<a
+							href="https://github.com/maxichrome/bill"
+							target="_blank"
+							rel="noreferrer"
+						>
+							source code
+						</a>
+					</small>
 				</p>
 			</footer>
 		</div>
