@@ -91,3 +91,15 @@
 	font-weight: bold;
 	font-size: 14px;
 }
+
+.rateInputRow {
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+	margin-bottom: 12px;
+}
+
+.rateHintText {
+	margin-left: 6px;
+	font-size: 14px;
+}

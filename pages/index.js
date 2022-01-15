@@ -13,16 +13,16 @@ const EMPTY_TIME_ENTRY = {
 	seconds: 0,
 };
 
-const MoneyText = ({ entry, rate }) => {
-	const valueInHundredths = Math.floor(
-		((entry.seconds / 60 + entry.minutes) / 60 + entry.hours) * rate * 100
-	);
+const timeToDecimal = ({ entry, rate }) =>
+	((entry.seconds / 60 + entry.minutes) / 60 + entry.hours) * rate;
+
+// TODO: consider moving this to a builtin solution like toLocaleString with options?
+const formatCurrency = (value) => {
+	const valueInHundredths = Math.floor(value * 100);
 
 	return (
-		<>
-			${Math.floor(valueInHundredths / 100)}.
-			{(valueInHundredths % 100).toString().padStart(2, "0")}
-		</>
+		`$${Math.floor((valueInHundredths || 0) / 100).toLocaleString()}` +
+		`.${((valueInHundredths || 0) % 100).toString().padStart(2, "0")}`
 	);
 };
 
@@ -104,14 +104,21 @@ export default function HomePage() {
 				<section>
 					<label className={styles.rateForm}>
 						<h2>hourly rate</h2>
-						<Input
-							id="rateInput"
-							type="number"
-							value={rate}
-							min={0}
-							onChange={(e) => setRate(e.target.value)}
-							onBlur={(e) => setRate(+e.target.value || 0)}
-						/>
+						<div className={styles.rateInputRow}>
+							<Input
+								id="rateInput"
+								type="number"
+								value={rate}
+								min={0}
+								onChange={(e) => setRate(e.target.value)}
+								onBlur={(e) => setRate(+e.target.value || 0)}
+							/>
+							<span className={styles.rateHintText}>
+								(${(rate * 40 * 52).toLocaleString()} yearly,{" "}
+								{formatCurrency(rate)}/hr &times; 40 hours/wk &times; 52
+								weeks/yr)
+							</span>
+						</div>
 					</label>
 				</section>
 
@@ -146,6 +153,7 @@ export default function HomePage() {
 										<Input
 											type="text"
 											value={entry.note}
+											placeholder="enter a note here"
 											onChange={(e) => {
 												updateTimeEntry(index, {
 													note: e.target.value,
@@ -156,6 +164,7 @@ export default function HomePage() {
 									<div className={styles.thinCell} role="cell">
 										<Input
 											type="number"
+											placeholder="hours"
 											value={entry.hours}
 											min={0}
 											onChange={(e) => {
@@ -174,6 +183,7 @@ export default function HomePage() {
 									<div className={styles.thinCell} role="cell">
 										<Input
 											type="number"
+											placeholder="minutes"
 											value={entry.minutes}
 											min={0}
 											max={59}
@@ -191,6 +201,7 @@ export default function HomePage() {
 									<div className={styles.thinCell} role="cell">
 										<Input
 											type="number"
+											placeholder="seconds"
 											value={entry.seconds}
 											min={0}
 											max={59}
@@ -206,7 +217,7 @@ export default function HomePage() {
 										/>
 									</div>
 									<div className={styles.thinCell} role="cell">
-										<MoneyText entry={entry} rate={rate} />
+										{formatCurrency(timeToDecimal({ entry, rate }))}
 									</div>
 									<div className={styles.actionCell} role="cell">
 										<Button
@@ -240,7 +251,8 @@ export default function HomePage() {
 								className={classNames(styles.entryRow, styles.totalRow)}
 							>
 								<div role="cell" className={styles.totalValue}>
-									Total amount: <MoneyText entry={totals} rate={rate} />
+									Total amount:{" "}
+									{formatCurrency(timeToDecimal({ entry: totals, rate }))}
 								</div>
 							</li>
 						</ul>
