@@ -103,9 +103,9 @@ export default function HomePage() {
 			</header>
 
 			<main>
-				<section>
+				<section aria-labelledby="hourlyRate_header">
 					<label className={styles.rateForm}>
-						<h2>hourly rate</h2>
+						<h2 id="hourlyRate_header">hourly rate</h2>
 						<div className={styles.rateInputRow}>
 							<Input
 								id="rateInput"
@@ -123,26 +123,50 @@ export default function HomePage() {
 					</label>
 				</section>
 
-				<section>
+				<section aria-label="Time entries">
 					<div className={styles.timeTable} role="table">
 						<header role="rowgroup">
 							<div role="row" className={styles.entryRow}>
-								<div className={styles.noteCell} role="cell">
+								<div
+									id="rowHeader_note"
+									className={styles.noteCell}
+									role="columnheader"
+								>
 									note
 								</div>
-								<div className={styles.thinCell} role="cell">
+								<div
+									id="rowHeader_hours"
+									className={styles.thinCell}
+									role="columnheader"
+								>
 									hours
 								</div>
-								<div className={styles.thinCell} role="cell">
+								<div
+									id="rowHeader_minutes"
+									className={styles.thinCell}
+									role="columnheader"
+								>
 									minutes
 								</div>
-								<div className={styles.thinCell} role="cell">
+								<div
+									id="rowHeader_seconds"
+									className={styles.thinCell}
+									role="columnheader"
+								>
 									seconds
 								</div>
-								<div className={styles.thinCell} role="cell">
+								<div
+									id="rowHeader_amount"
+									className={styles.thinCell}
+									role="columnheader"
+								>
 									amount
 								</div>
-								<div className={styles.actionCell} role="cell">
+								<div
+									id="rowHeader_actions"
+									className={styles.actionCell}
+									role="columnheader"
+								>
 									actions
 								</div>
 							</div>
@@ -150,7 +174,11 @@ export default function HomePage() {
 						<ul role="rowgroup">
 							{timeEntries.map((entry, index) => (
 								<li key={index} className={styles.entryRow} role="row">
-									<div className={styles.noteCell} role="cell">
+									<div
+										className={styles.noteCell}
+										role="cell"
+										aria-labelledby="rowHeader_note"
+									>
 										<Input
 											type="text"
 											value={entry.note}
@@ -162,7 +190,11 @@ export default function HomePage() {
 											}}
 										/>
 									</div>
-									<div className={styles.thinCell} role="cell">
+									<div
+										className={styles.thinCell}
+										role="cell"
+										aria-labelledby="rowHeader_hours"
+									>
 										<Input
 											type="number"
 											placeholder="hours"
@@ -181,7 +213,11 @@ export default function HomePage() {
 											}}
 										/>
 									</div>
-									<div className={styles.thinCell} role="cell">
+									<div
+										className={styles.thinCell}
+										role="cell"
+										aria-labelledby="rowHeader_minutes"
+									>
 										<Input
 											type="number"
 											placeholder="minutes"
@@ -199,7 +235,11 @@ export default function HomePage() {
 											}}
 										/>
 									</div>
-									<div className={styles.thinCell} role="cell">
+									<div
+										className={styles.thinCell}
+										role="cell"
+										aria-labelledby="rowHeader_seconds"
+									>
 										<Input
 											type="number"
 											placeholder="seconds"
@@ -217,10 +257,18 @@ export default function HomePage() {
 											}}
 										/>
 									</div>
-									<div className={styles.thinCell} role="cell">
+									<div
+										className={styles.thinCell}
+										role="cell"
+										aria-labelledby="rowHeader_amount"
+									>
 										{formatCurrency(timeToDecimal({ entry, rate }))}
 									</div>
-									<div className={styles.actionCell} role="cell">
+									<div
+										className={styles.actionCell}
+										role="cell"
+										aria-labelledby="rowHeader_actions"
+									>
 										<Button
 											disabled={timeEntries.length <= 1}
 											onClick={() => {
@@ -247,16 +295,17 @@ export default function HomePage() {
 									</div>
 								</li>
 							))}
-							<li
-								role="row"
-								className={classNames(styles.entryRow, styles.totalRow)}
-							>
-								<div role="cell" className={styles.totalValue}>
-									Total amount:{" "}
-									{formatCurrency(timeToDecimal({ entry: totals, rate }))}
-								</div>
-							</li>
 						</ul>
+						<section
+							aria-label="Totals"
+							role="row"
+							className={classNames(styles.entryRow, styles.totalRow)}
+						>
+							<div role="cell" className={styles.totalValue}>
+								Total amount:{" "}
+								{formatCurrency(timeToDecimal({ entry: totals, rate }))}
+							</div>
+						</section>
 					</div>
 
 					<Button
