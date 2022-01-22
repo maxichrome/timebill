@@ -1,16 +1,15 @@
 .maxiemblem {
-	position: fixed;
+	position: absolute;
 	top: 30px;
 	right: 30px;
 	width: 64px;
 	height: 64px;
-	box-shadow: 0 0.5px 3px #00000059;
-	border-radius: 32px;
-	overflow: hidden;
 }
 
 .maxiemblem img {
 	transition: transform 0.1s ease-out;
+	border-radius: 32px;
+	box-shadow: 0 0.5px 3px #00000059;
 }
 
 .maxiemblem:hover img {
