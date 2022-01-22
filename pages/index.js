@@ -116,9 +116,8 @@ export default function HomePage() {
 								onBlur={(e) => setRate(+e.target.value || 0)}
 							/>
 							<span className={styles.rateHintText}>
-								(${(rate * 40 * 52).toLocaleString()} yearly,{" "}
 								{formatCurrency(rate)}/hr &times; 40 hours/wk &times; 52
-								weeks/yr)
+								weeks/yr = ${(rate * 40 * 52).toLocaleString()} yearly
 							</span>
 						</div>
 					</label>
