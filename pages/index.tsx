@@ -112,7 +112,7 @@ export default function HomePage() {
 								type="number"
 								value={rate}
 								min={0}
-								onChange={(e) => setRate(e.target.value)}
+								onChange={(e) => setRate(e.target.valueAsNumber)}
 								onBlur={(e) => setRate(+e.target.value || 0)}
 							/>
 							<span className={styles.rateHintText}>

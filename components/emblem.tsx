@@ -4,7 +4,7 @@
 
 import styles from "./emblem.module.css";
 
-export const MaxichromeEmblem = () => (
+export const MaxichromeEmblem: React.FC = () => (
 	<a
 		className={styles.maxiemblem}
 		href="https://maxichrome.dev"
