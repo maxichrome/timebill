@@ -97,10 +97,12 @@ export default function HomePage() {
 				<title>timebill</title>
 			</Head>
 
-			<main>
+			<header>
 				<h1>timebill</h1>
 				<p className={styles.subtitle}>figure out how much ya gettin paid</p>
+			</header>
 
+			<main>
 				<section>
 					<label className={styles.rateForm}>
 						<h2>hourly rate</h2>
