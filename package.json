@@ -1,5 +1,5 @@
 {
-	"name": "bill",
+	"name": "timebill",
 	"private": true,
 	"scripts": {
 		"dev": "next dev",
